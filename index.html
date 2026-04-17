@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CryptoView — Live Crypto Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a class="nav-logo" onclick="showView('home')">
+    <div class="logo-icon">₿</div>
+    <span class="logo-text">CryptoView</span>
+  </a>
+  <div class="nav-actions">
+    <button class="nav-btn active" onclick="showView('home')" id="navHome">Home</button>
+    <button class="nav-btn" onclick="showView('search')" id="navSearch">Search</button>
+    <button class="nav-btn" onclick="showView('favorites')" id="navFavs">⭐ Saved</button>
+    <button class="theme-toggle" onclick="toggleTheme()">☀/☾</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== HOME VIEW ===== -->
+<div class="view active" id="view-home">
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-tag">🟢 Live Market Data</div>
+      <h1 class="hero-title">Track <span>Crypto</span><br>Like a Pro</h1>
+      <p class="hero-sub">Real-time prices, interactive charts, and deep analytics for every cryptocurrency — all in one place.</p>
+      <div class="hero-search">
+        <input type="text" placeholder="Search Bitcoin, Ethereum..." id="heroSearchInput" onkeydown="if(event.key==='Enter')heroSearch()">
+        <button onclick="heroSearch()">Search →</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-val" id="globalMcap">—</div>
+          <div class="stat-label">Market Cap</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="globalVol">—</div>
+          <div class="stat-label">24h Volume</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="btcDom">—</div>
+          <div class="stat-label">BTC Dom.</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="float-card">
+        <div class="fc-header">
+          <div class="fc-icon">₿</div>
+          <div class="fc-name">Bitcoin (BTC)</div>
+        </div>
+        <div class="fc-price" id="fc-btc-price">Loading...</div>
+        <div class="fc-change up" id="fc-btc-change">+0.00%</div>
+        <canvas class="fc-sparkline" id="sparkBTC" width="160" height="40"></canvas>
+      </div>
+      <div class="float-card">
+        <div class="fc-header">
+          <div class="fc-icon" style="background:#627eea;color:#fff">Ξ</div>
+          <div class="fc-name">Ethereum (ETH)</div>
+        </div>
+        <div class="fc-price" id="fc-eth-price">Loading...</div>
+        <div class="fc-change up" id="fc-eth-change">+0.00%</div>
+        <canvas class="fc-sparkline" id="sparkETH" width="160" height="40"></canvas>
+      </div>
+      <div class="float-card">
+        <div class="fc-header">
+          <div class="fc-icon" style="background:#26a17b;color:#fff">₮</div>
+          <div class="fc-name">Tether (USDT)</div>
+        </div>
+        <div class="fc-price" id="fc-usdt-price">$1.00</div>
+        <div class="fc-change up" id="fc-usdt-change">+0.01%</div>
+        <canvas class="fc-sparkline" id="sparkUSDT" width="160" height="40"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker-section">
+    <div class="section-label">Top Movers</div>
+    <div class="ticker-wrapper">
+      <div class="ticker-track" id="tickerTrack">
+        <div class="loading"><div class="spin"></div> Loading coins...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Coins -->
+  <div class="coins-section">
+    <div class="coins-header">
+      <h2 class="coins-title">Top <span>Cryptocurrencies</span></h2>
+      <button class="nav-btn" onclick="showView('search')">View All →</button>
+    </div>
+    <div class="coins-grid" id="coinsGrid">
+      <div class="loading"><div class="spin"></div> Fetching market data...</div>
+    </div>
+  </div>
+
+  <!-- News -->
+  <div class="news-section">
+    <div class="section-label">Crypto News</div>
+    <div class="news-grid" id="newsGrid">
+      <div class="loading"><div class="spin"></div> Loading news...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SEARCH VIEW ===== -->
+<div class="view" id="view-search">
+  <div class="search-hero">
+    <h1>Find Any <span>Coin</span></h1>
+    <p>Search across thousands of cryptocurrencies</p>
+    <div class="search-bar">
+      <input type="text" placeholder="Enter coin name or symbol..." id="searchInput" onkeydown="if(event.key==='Enter')searchCoins()">
+      <button onclick="searchCoins()">Search</button>
+    </div>
+  </div>
+  <div class="search-results" id="searchResults">
+    <div class="empty"><span class="emoji">🔍</span>Enter a coin name above to begin searching</div>
+  </div>
+</div>
+
+<!-- ===== DETAIL VIEW ===== -->
+<div class="view" id="view-detail">
+  <button class="back-btn" onclick="goBack()">← Back</button>
+  <div id="detailContent">
+    <div class="loading"><div class="spin"></div> Loading coin data...</div>
+  </div>
+</div>
+
+<!-- ===== FAVORITES VIEW ===== -->
+<div class="view" id="view-favorites">
+  <div class="search-hero">
+    <h1>Your <span>Saved</span> Coins</h1>
+    <p>Coins you've starred for quick access</p>
+  </div>
+  <div class="coins-section">
+    <div class="coins-grid" id="favsGrid">
+      <div class="empty"><span class="emoji">⭐</span>No saved coins yet. Star coins to add them here!</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
